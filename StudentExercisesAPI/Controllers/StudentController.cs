@@ -39,11 +39,11 @@ namespace StudentExercisesAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    //SELECT s.Id, s.FirstName, s.LastName, s.SlackHandle, s.CohortId, c.Id, c.Name 
-                    //FROM Student s INNER JOIN Cohort c ON s.CohortId = c.Id;
-                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName, s.SlackHandle, s.CohortId, c.Name AS CohortName, 
+                    cmd.CommandText = @"
+                                    SELECT s.Id, s.FirstName, s.LastName, s.SlackHandle,
+                                        s.CohortId, c.Name AS CohortName, 
 		                                se.ExerciseId, e.Name AS ExerciseName, e.Language
-	                                    FROM Student s INNER JOIN Cohort c ON s.CohortId =c.Id
+	                                FROM Student s INNER JOIN Cohort c ON s.CohortId = c.Id
 	                                    LEFT JOIN StudentExercise se ON se.StudentId = s.id
 	                                    LEFT JOIN Exercise e on se.exerciseId = e.Id";
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -53,9 +53,9 @@ namespace StudentExercisesAPI.Controllers
                     while (reader.Read())
                     {
                         int studentId = reader.GetInt32(reader.GetOrdinal("Id")); //get the id
-                        if (!students.ContainsKey(studentId)) //have I seen this student before?
+                        if (! students.ContainsKey(studentId)) //have I seen this student before?
                         {
-                            Student newStudent = new Student //() if it does not..then lets create it.
+                            Student newStudent = new Student() //() if it does not..then lets create it.
                             {
                                 Id = reader.GetInt32(reader.GetOrdinal("Id")),
                                 FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
@@ -73,7 +73,7 @@ namespace StudentExercisesAPI.Controllers
 
                         Student fromDictionary = students[studentId];
 
-                        if (!reader.IsDBNull(reader.GetOrdinal("ExerciseId"))) //only if i have an exercise id then it will run.
+                        if (! reader.IsDBNull(reader.GetOrdinal("ExerciseId"))) //only if i have an exercise id then it will run.
                         {
                             Exercise anExercise = new Exercise()
                             {
@@ -83,7 +83,7 @@ namespace StudentExercisesAPI.Controllers
                             };
                         fromDictionary.exerciseList.Add(anExercise); //move up into if
                         }
-                                                                     //got an error saying idk how to serialize a dictionary. 
+                         //got an error saying idk how to serialize a dictionary. 
 
 
                         /*
