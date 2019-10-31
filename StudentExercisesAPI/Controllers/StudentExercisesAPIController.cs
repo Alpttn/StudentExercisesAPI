@@ -1,4 +1,5 @@
-﻿using System;
+﻿//this is the controller for exercises
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ namespace StudentExercisesAPI.Controllers
         }
         // GET: api/StudentExercisesAPI ***Code for getting a list of exercises
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAllExercises()
         {
             using (SqlConnection conn = Connection)
             {
@@ -67,15 +68,15 @@ namespace StudentExercisesAPI.Controllers
         }
 
         // GET: api/StudentExercisesAPI/5 ***Code for getting a single exercise
-        [HttpGet("{id}", Name = "Get")]
-        public IActionResult Get(int id)
+        [HttpGet("{id}", Name = "GetExercise")]
+        public IActionResult GetExercise(int id)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT id, name, language,  
+                    cmd.CommandText = @"SELECT id, name, language  
                                           FROM Exercise
                                          WHERE id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -104,7 +105,7 @@ namespace StudentExercisesAPI.Controllers
         }
         // POST: api/StudentExercisesAPI ***Code for creating an exercise
         [HttpPost]
-        public void Post([FromBody] Exercise newExercise)
+        public void AddExercise([FromBody] Exercise newExercise)
         {
             using (SqlConnection conn = Connection)
             {
@@ -120,16 +121,67 @@ namespace StudentExercisesAPI.Controllers
             }
         }
 
-        // PUT: api/StudentExercisesAPI/5
+        // PUT: api/StudentExercisesAPI ***code for updating exercise
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void UpdateExercise([FromRoute] int id, [FromBody] Exercise exercise)
         {
-        }
+            //try
+            //{
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Exercise
+                                            SET Name = @name,
+                                                Language = @language
+                                            WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@name", exercise.Name));
+                    cmd.Parameters.Add(new SqlParameter("@language", exercise.Language));
+                    cmd.Parameters.Add(new SqlParameter("@id", id)); //do I need this id?
 
-        // DELETE: api/ApiWithActions/5
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        //                if (rowsAffected > 0)
+        //                {
+        //                    return new StatusCodeResult(StatusCodes.Status204NoContent);
+        //                }
+        //                throw new Exception("No rows affected");
+        //            }
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        if (!ExerciseExists(id))
+        //        {
+        //            return NotFound();
+        //        }
+        //        else
+        //        {
+        //            throw;
+        //        }
+        //    }
+        //}
+
+        // DELETE: api/ApiWithActions/5 ***code to delete exercise
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void DeleteExercise([FromRoute] int id)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE FROM Exercise
+                                            WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    
+                }
+            }
+
         }
     }
 }

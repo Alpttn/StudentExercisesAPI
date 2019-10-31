@@ -9,7 +9,8 @@ namespace StudentExercisesAPI.Models
 {
     public class Instructor : NSSPerson
     {
-        public string InstructorSpeciality { get; set; }
+        public int Id { get; set; }
+        public string Speciality { get; set; }
 
         //public Instructor(string firstName, string lastName, string slackHandle, Cohort cohort, string instructorSpeciality)
         //{

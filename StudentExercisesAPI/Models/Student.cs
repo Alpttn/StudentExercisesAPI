@@ -8,6 +8,7 @@ namespace StudentExercisesAPI.Models
 {
     public class Student : NSSPerson
     {
+        public int Id { get; set; }
         //list of student exercises
         public List<Exercise> exerciseList { get; set; }
 
