@@ -39,36 +39,67 @@ namespace StudentExercisesAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName, s.SlackHandle, s.CohortId, c.Name 
-                                        FROM Student s LEFT JOIN Cohort c ON s.CohortId = c.Id";
+                    //SELECT s.Id, s.FirstName, s.LastName, s.SlackHandle, s.CohortId, c.Id, c.Name 
+                    //FROM Student s INNER JOIN Cohort c ON s.CohortId = c.Id;
+                    cmd.CommandText = @"SELECT s.Id, s.FirstName, s.LastName, s.SlackHandle, s.CohortId, c.Name AS CohortName, 
+		                                se.ExerciseId, e.Name AS ExerciseName, e.Language
+	                                    FROM Student s INNER JOIN Cohort c ON s.CohortId =c.Id
+	                                    LEFT JOIN StudentExercise se ON se.StudentId = s.id
+	                                    LEFT JOIN Exercise e on se.exerciseId = e.Id";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    List<Student> students = new List<Student>();
+                    Dictionary<int, Student> students = new Dictionary<int, Student>();
 
                     while (reader.Read())
                     {
-                        Student student = new Student
+                        int studentId = reader.GetInt32(reader.GetOrdinal("Id")); //get the id
+                        if (!students.ContainsKey(studentId)) //have I seen this student before?
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
-                        };
-                        students.Add(student);
-                    }
-                    reader.Close();
+                            Student newStudent = new Student //() if it does not..then lets create it.
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
+                                CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                Cohort = new Cohort()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                    Name = reader.GetString(reader.GetOrdinal("CohortName")),
+                                }
+                            };
+                            students.Add(studentId, newStudent);
+                        }
 
-                    /*
-                        The Ok() method is an abstraction that constructs
-                        a new HTTP response with a 200 status code, and converts
-                        your IEnumerable into a JSON string to be sent back to
-                        the requessting client application.
-                    */
-                    return Ok(students);
+                        Student fromDictionary = students[studentId];
+
+                        if (!reader.IsDBNull(reader.GetOrdinal("ExerciseId"))) //only if i have an exercise id then it will run.
+                        {
+                            Exercise anExercise = new Exercise()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("ExerciseId")),
+                                Name = reader.GetString(reader.GetOrdinal("ExerciseName")), //need to disambiguate
+                                Language = reader.GetString(reader.GetOrdinal("Language"))
+                            };
+                        fromDictionary.exerciseList.Add(anExercise); //move up into if
+                        }
+                                                                     //got an error saying idk how to serialize a dictionary. 
+
+
+                        /*
+                            The Ok() method is an abstraction that constructs
+                            a new HTTP response with a 200 status code, and converts
+                            your IEnumerable into a JSON string to be sent back to
+                            the requessting client application.
+                        */
+                    }
+                        reader.Close();
+                        return Ok(students.Values);
                 }
             }
         }
+            
+        
 
         // GET: api/Student/5 ***Code for get student by Id
         [HttpGet("{id}", Name = "GetStudent")]

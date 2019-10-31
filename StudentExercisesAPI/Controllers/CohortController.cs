@@ -32,14 +32,14 @@ namespace StudentExercisesAPI.Controllers
         }
         // GET: api/Cohort ***code for get all cohorts
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> GetAllCohorts()
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = $"SELECT Id, Name, LastName, SlackHandle, CohortId FROM Student";
+                    cmd.CommandText = $"SELECT Id, Name FROM Cohort";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Student> students = new List<Student>();

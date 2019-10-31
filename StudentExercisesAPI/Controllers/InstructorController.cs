@@ -39,34 +39,46 @@ namespace StudentExercisesAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT i.Id, i.FirstName, i.LastName, i.SlackHandle, i.Specialty, i.CohortId
-                        FROM Instructor i LEFT JOIN Cohort c ON i.CohortId = c.Id";
+                    cmd.CommandText = @"SELECT i.Id, i.FirstName, i.LastName, i.SlackHandle, i.Speciality, i.CohortId, c.Name AS CohortName
+                        FROM Instructor i INNER JOIN Cohort c ON i.CohortId = c.Id";
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    List<Instructor> instructors = new List<Instructor>();
+                    Dictionary<int, Instructor> instructors = new Dictionary<int, Instructor>();
 
                     while (reader.Read())
                     {
-                        Instructor instructor = new Instructor
+                        int instructorId = reader.GetInt32(reader.GetOrdinal("Id")); //get the id
+                        if (!instructors.ContainsKey(instructorId)) //have I seen this instructor before?
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            Speciality = reader.GetString(reader.GetOrdinal("Speciality")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId"))
-                        };
-                        instructors.Add(instructor);
-                    }
-                    reader.Close();
 
-                    /*
-                        The Ok() method is an abstraction that constructs
-                        a new HTTP response with a 200 status code, and converts
-                        your IEnumerable into a JSON string to be sent back to
-                        the requessting client application.
-                    */
-                    return Ok(instructors);
+                            Instructor newInstructor = new Instructor
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
+                                Speciality = reader.GetString(reader.GetOrdinal("Speciality")),
+                                CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                Cohort = new Cohort()
+                                {
+                                    Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                    Name = reader.GetString(reader.GetOrdinal("CohortName")),
+                                }
+                            };
+                            instructors.Add(instructorId, newInstructor);
+                        }
+
+                     
+
+                        /*
+                            The Ok() method is an abstraction that constructs
+                            a new HTTP response with a 200 status code, and converts
+                            your IEnumerable into a JSON string to be sent back to
+                            the requessting client application.
+                        */
+                    }
+                        reader.Close();
+                        return Ok(instructors.Values);
                 }
             }
         }
