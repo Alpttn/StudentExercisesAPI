@@ -103,7 +103,7 @@ namespace StudentExercisesAPI.Controllers
 
         // GET: api/Student/5 ***Code for get student by Id
         [HttpGet("{id}", Name = "GetStudent")]
-        public IActionResult GetStudent(int id)
+        public async Task<IActionResult> GetStudent(int id)
         {
             using (SqlConnection conn = Connection)
             {
