@@ -110,7 +110,7 @@ namespace StudentExercisesAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT s.id, s.FirstName, s.LastName, s.SlackHandle, s.CohortId, c.Name  
+                    cmd.CommandText = @"SELECT s.id, s.FirstName, s.LastName, s.SlackHandle, s.CohortId, c.Name AS CohortName  
                                           FROM Student s LEFT JOIN Cohort c ON s.CohortId = c.Id
                                          WHERE s.id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -126,7 +126,11 @@ namespace StudentExercisesAPI.Controllers
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
                             CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                            //do i put cohort here
+                            Cohort = new Cohort()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                Name = reader.GetString(reader.GetOrdinal("CohortName")),
+                            }
                         };
                     }
 

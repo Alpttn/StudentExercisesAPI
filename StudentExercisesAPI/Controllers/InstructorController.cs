@@ -109,6 +109,11 @@ namespace StudentExercisesAPI.Controllers
                             SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
                             Speciality = reader.GetString(reader.GetOrdinal("Speciality")),
                             CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                            Cohort = new Cohort()
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
+                                Name = reader.GetString(reader.GetOrdinal("CohortName")),
+                            }
                         };
                     }
 
