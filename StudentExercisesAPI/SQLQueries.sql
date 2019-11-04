@@ -17,3 +17,8 @@
 
 --SELECT i.Id, i.FirstName, i.LastName, i.SlackHandle, i.Speciality, i.CohortId, c.Name AS CohortName
 --                        FROM Instructor i INNER JOIN Cohort c ON i.CohortId = c.Id
+
+--SELECT c.Id, c.Name, s.Id AS 'StudentId', s.FirstName, s.LastName, s.SlackHandle,
+--                                        i.Id AS 'InstructorId', i.FirstName, i.LastName, i.SlackHandle, i.Speciality
+--                                        FROM Cohort c LEFT JOIN Student s ON s.CohortId = c.Id    
+--                                        LEFT JOIN Instructor i ON i.CohortId = c.Id

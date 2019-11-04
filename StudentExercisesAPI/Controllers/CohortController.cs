@@ -40,10 +40,10 @@ namespace StudentExercisesAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                                        SELECT c.Id, c.CohortName, s.Id AS 'StudentId', s.FirstName, s.LastName, s.SlackHandle
+                                        SELECT c.Id, c.Name, s.Id AS 'StudentId', s.FirstName, s.LastName, s.SlackHandle
                                         i.Id AS 'InstructorId', i.FirstName, i.LastName, i.SlackHandle, i.Speciality
                                         FROM Cohort c LEFT JOIN Student s ON s.CohortId = c.Id    
-                                        LEFT JOIN Instructor i ON i.InstuctorId = c.Id";
+                                        LEFT JOIN Instructor i ON i.CohortId = c.Id";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     Dictionary<int, Cohort> cohorts = new Dictionary<int, Cohort>();
@@ -88,6 +88,7 @@ namespace StudentExercisesAPI.Controllers
                             };
                             fromDictionary.InstructorList.Add(newInstructor);
                         }
+                    }
 
 
                         reader.Close();
@@ -99,7 +100,7 @@ namespace StudentExercisesAPI.Controllers
                             the requessting client application.
                         */
                         return Ok(cohorts.Values);
-                    }
+                    
                 }
             }
         }
