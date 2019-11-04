@@ -28,3 +28,5 @@ SELECT c.Id, c.Name, s.Id AS 'StudentId', s.FirstName, s.LastName, s.SlackHandle
                                         FROM Cohort c
                                          LEFT JOIN Student s ON s.CohortId = c.Id    
                                         LEFT JOIN Instructor i ON i.CohortId = c.Id;
+
+--SELECT * FROM Student
